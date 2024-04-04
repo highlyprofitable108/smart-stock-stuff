@@ -1,0 +1,11 @@
+alpha_vantage
+fredapi
+lxml
+matplotlib
+nltk
+pandas
+pymongo
+python-dotenv
+seaborn
+tweepy
+yfinance
