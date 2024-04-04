@@ -26,7 +26,7 @@ def get_quarter_dates(year, quarter):
 
 def cleanup_sentiment_data(symbol, from_date, to_date):
     """
-    Removes articles and sentiment scores for the specified symbol and quarter 
+    Removes articles and sentiment scores for the specified symbol and quarter
     if the sentiment score does not exist or is 0.
     """
     quarter_range = f"{from_date} to {to_date}"

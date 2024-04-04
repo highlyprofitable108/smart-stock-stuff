@@ -5,15 +5,18 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+
 # Common method to get MongoDB URI
 def get_mongo_uri():
     return os.getenv('MONGO_URI')
+
 
 # Common method to connect to MongoDB
 def connect_to_mongodb():
     mongo_client = MongoClient(get_mongo_uri())
     db = mongo_client.stock_data  # Change 'stock_data' to your actual database name
     return db
+
 
 # Common method to get the full schema for a MongoDB database
 def get_mongodb_schema(db):
@@ -34,16 +37,18 @@ def get_mongodb_schema(db):
 
     return schema
 
+
 # Main function
 def main():
     # Connect to MongoDB
     db = connect_to_mongodb()
-    
+
     # Get MongoDB schema
     schema = get_mongodb_schema(db)
-    
+
     # Print schema
     print(schema)
+
 
 if __name__ == "__main__":
     main()
