@@ -43,6 +43,40 @@ def cleanup_sentiment_data(symbol, from_date, to_date):
         debug_print(f"Valid score exists for {symbol} in quarter {quarter_range}. No action taken.", True)
 
 
+def remove_duplicate_articles(symbol, from_date, to_date):
+    """
+    Removes duplicate articles for the specified symbol within a date range,
+    keeping only the first document encountered for each unique combination
+    of symbol and article.
+    """
+    pipeline = [
+        {
+            "$match": {
+                "symbol": symbol,
+                "date": {"$gte": from_date, "$lte": to_date}
+            }
+        },
+        {
+            "$group": {
+                "_id": {"symbol": "$symbol", "article": "$article"},
+                "docIds": {"$push": "$_id"}
+            }
+        },
+        {
+            "$match": {
+                "docIds": {"$not": {"$size": 1}}
+            }
+        }
+    ]
+
+    duplicates = list(db.sentiment_txt.aggregate(pipeline))
+
+    for duplicate in duplicates:
+        # Keep the first document and remove the rest
+        to_remove = duplicate["docIds"][1:]  # Skip the first ID
+        db.sentiment_txt.delete_many({"_id": {"$in": to_remove}})
+
+
 if __name__ == '__main__':
     symbols = db.company_info.distinct("Symbol")
     for symbol in symbols:
@@ -54,3 +88,4 @@ if __name__ == '__main__':
                 if datetime.strptime(from_date, '%Y-%m-%d') > datetime.now():
                     continue
                 cleanup_sentiment_data(symbol, from_date, to_date)
+                remove_duplicate_articles(symbol, from_date, to_date)

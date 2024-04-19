@@ -40,7 +40,14 @@ def process_articles_for_symbol(symbol, start_year=2019, end_year=datetime.now()
                 continue  # Skip processing if already done
 
             cursor = db.sentiment_txt.find({'symbol': symbol, 'quarter': quarter_range})
-            scores = [analyze_sentiment(doc['title']) for doc in cursor if doc.get('title')]
+            unique_titles = set()
+            scores = []
+
+            for doc in cursor:
+                title = doc.get('title')
+                if title and title not in unique_titles:
+                    unique_titles.add(title)  # Track unique titles
+                    scores.append(analyze_sentiment(title))  # Analyze sentiment of unique titles only
 
             if scores:
                 avg_score = sum(scores) / len(scores)
@@ -54,7 +61,7 @@ def process_articles_for_symbol(symbol, start_year=2019, end_year=datetime.now()
 
 def process_articles(start_year=2019):
     """Initiates processing of articles for all S&P 500 symbols."""
-    sp500_symbols = fetch_sp500_symbols()  # Ensure this fetches a list of symbols
+    sp500_symbols = fetch_sp500_symbols()  # Assume this function correctly fetches a list of symbols
     for symbol in sp500_symbols:
         process_articles_for_symbol(symbol, start_year=start_year)
 
